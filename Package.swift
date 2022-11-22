@@ -1,28 +1,30 @@
 // swift-tools-version: 5.7
-// The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
-    name: "CloudKitBodega",
-    products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
-        .library(
-            name: "CloudKitBodega",
-            targets: ["CloudKitBodega"]),
-    ],
-    dependencies: [
-        // Dependencies declare other packages that this package depends on.
-        // .package(url: /* package url */, from: "1.0.0"),
-    ],
-    targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages this package depends on.
-        .target(
-            name: "CloudKitBodega",
-            dependencies: []),
-        .testTarget(
-            name: "CloudKitBodegaTests",
-            dependencies: ["CloudKitBodega"]),
-    ]
+  name: "CloudKitBodega",
+  platforms: [
+    .iOS(.v13),
+    .macOS(.v12),
+  ],
+  products: [
+    .library(
+      name: "CloudKitBodega",
+      targets: ["CloudKitBodega"]),
+  ],
+  dependencies: [
+    .package(url: "https://github.com/mergesort/Bodega", from: "2.0.2"),
+  ],
+  targets: [
+    .target(
+      name: "CloudKitBodega",
+      dependencies: [
+        "Bodega"
+      ]
+    ),
+    .testTarget(
+      name: "CloudKitBodegaTests",
+      dependencies: ["CloudKitBodega"]),
+  ]
 )

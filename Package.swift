@@ -5,13 +5,14 @@ import PackageDescription
 let package = Package(
   name: "CloudKitBodega",
   platforms: [
-    .iOS(.v13),
+    .iOS(.v15),
     .macOS(.v12),
   ],
   products: [
     .library(
       name: "CloudKitBodega",
-      targets: ["CloudKitBodega"]),
+      targets: ["CloudKitBodega"]
+    ),
   ],
   dependencies: [
     .package(url: "https://github.com/mergesort/Bodega", from: "2.0.2"),
@@ -20,11 +21,12 @@ let package = Package(
     .target(
       name: "CloudKitBodega",
       dependencies: [
-        "Bodega"
+        "Bodega",
       ]
     ),
     .testTarget(
       name: "CloudKitBodegaTests",
-      dependencies: ["CloudKitBodega"]),
+      dependencies: ["CloudKitBodega"]
+    ),
   ]
 )

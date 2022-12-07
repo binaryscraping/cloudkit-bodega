@@ -21,10 +21,11 @@ struct ContentView: View {
   var body: some View {
     NavigationStack {
       List {
-        ForEach(accounts.items) { account in
+        ForEach(accounts.items.sorted(using: KeyPathComparator(\.createdAt, order: .reverse))) { account in
           LabeledContent("Name", value: account.name)
         }
       }
+      .animation(.default, value: accounts.items)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
           Button {

@@ -97,6 +97,7 @@ public actor CloudKitStorageEngine: StorageEngine {
         fatalError()
       }
     } catch {
+      logger.error("Error reading all data and keys: \(String(describing: error))")
       return []
     }
   }

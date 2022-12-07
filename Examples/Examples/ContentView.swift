@@ -49,6 +49,12 @@ struct ContentView: View {
               }
             }
           }
+
+          ToolbarItem(placement: .cancellationAction) {
+            Button("Cancel", role: .cancel) {
+              route = nil
+            }
+          }
         }
       }
       .padding()

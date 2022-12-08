@@ -9,51 +9,77 @@ import SwiftUI
 import SwiftUINavigation
 import Boutique
 
-struct ContentView: View {
-  @ObservedObject var accounts: Store<Account>
-
+final class ViewModel: ObservableObject {
   enum Route {
     case add(Account)
   }
 
-  @State private var route: Route?
+  @Published var route: Route?
+  @Stored(in: .accounts) private var _accounts
+
+  @MainActor var accounts: [Account] {
+    _accounts.sorted(using: KeyPathComparator(\.createdAt, order: .reverse))
+  }
+
+  init(route: Route? = nil, accounts: Store<Account> = .accounts) {
+    self.route = route
+    __accounts = Stored(in: accounts)
+  }
+
+  func addButtonTapped() {
+    route = .add(.init(id: UUID(), name: "", balance: 0, createdAt: Date()))
+  }
+
+  func confirmAddButtonTapped() {
+    Task { @MainActor in
+      guard case let .add(account) = route else {
+        return
+      }
+
+      try! await $_accounts.insert(account)
+      route = nil
+    }
+  }
+
+  func cancelAddButtonTapped() {
+    route = nil
+  }
+}
+
+struct ContentView: View {
+  @ObservedObject var viewModel: ViewModel
 
   var body: some View {
     NavigationStack {
       List {
-        ForEach(accounts.items.sorted(using: KeyPathComparator(\.createdAt, order: .reverse))) { account in
+        ForEach(viewModel.accounts) { account in
           LabeledContent("Name", value: account.name)
         }
       }
-      .animation(.default, value: accounts.items)
+      .animation(.default, value: viewModel.accounts)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
           Button {
-            route = .add(Account(id: UUID(), name: "", balance: 0, createdAt: Date()))
+            viewModel.addButtonTapped()
           } label: {
             Label("Add", systemImage: "plus")
           }
         }
       }
     }
-    .sheet(unwrapping: $route, case: /Route.add) { $account in
+    .sheet(unwrapping: $viewModel.route, case: /ViewModel.Route.add) { $account in
       NavigationStack {
-        Form {
-          TextField("Name", text: $account.name)
-        }
+        EditAccountView(account: $account)
         .toolbar {
           ToolbarItem(placement: .confirmationAction) {
             Button("Save") {
-              Task { @MainActor in
-                try! await accounts.insert(account)
-                route = nil
-              }
+              viewModel.confirmAddButtonTapped()
             }
           }
 
           ToolbarItem(placement: .cancellationAction) {
             Button("Cancel", role: .cancel) {
-              route = nil
+              viewModel.cancelAddButtonTapped()
             }
           }
         }
@@ -66,6 +92,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
   static var previews: some View {
-    ContentView(accounts: .previewStore(items: [], cacheIdentifier: \.id.uuidString))
+    ContentView(viewModel: ViewModel(accounts: .previewStore(items: [], cacheIdentifier: \.id.uuidString)))
   }
 }

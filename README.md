@@ -1,3 +1,3 @@
-# CloudKitBodega
+# `cloudkit-bodega`
 
-A description of this package.
+A CloudKit backend for Bodega.
